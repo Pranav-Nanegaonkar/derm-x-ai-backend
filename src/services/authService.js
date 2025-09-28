@@ -12,6 +12,7 @@ class AuthService {
       const userProfile = {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
+        
         displayName:
           firebaseUser.displayName ||
           additionalData.fullName ||
