@@ -36,8 +36,8 @@ connectDB()
 // Security middleware (Helmet)
 app.use(
   helmet({
-    crossOriginOpenerPolicy: false, // Fixes OAuth popup window.close issue
-    crossOriginEmbedderPolicy: false, // Needed for cross-origin resources
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
@@ -48,13 +48,13 @@ app.use(compression());
 // Rate limiting
 app.use(
   rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100,
     message: "Too many requests from this IP, please try again later.",
   })
 );
 
-// CORS setup for frontend (Vercel or local)
+// CORS setup for frontend (Vercel + local)
 const allowedOrigins = [
   process.env.CLIENT_URL || "http://localhost:5173",
   "http://localhost:8080",
@@ -71,9 +71,12 @@ app.use(
       }
     },
     credentials: true,
-    optionsSuccessStatus: 200,
+    optionsSuccessStatus: 200, // for legacy browsers
   })
 );
+
+// Handle preflight requests for all routes
+app.options("*", cors());
 
 // Body parsers
 app.use(express.json({ limit: "10mb" }));
